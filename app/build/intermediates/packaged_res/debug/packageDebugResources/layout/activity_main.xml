@@ -142,62 +142,82 @@
     </LinearLayout>
 
     <!-- Start screen overlay -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/startOverlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#DD0F0F19"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="32dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/app_name"
-            android:textColor="#FFFFFF"
-            android:textSize="42sp"
-            android:textStyle="bold" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/splash_bg" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/subtitle"
-            android:textColor="#8888AA"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="220dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="48dp"
-            android:backgroundTint="#FF6200EE"
-            android:text="@string/play"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88000010"
             android:gravity="center"
-            android:text="@string/controls_hint"
-            android:textColor="#666680"
-            android:textSize="13sp" />
+            android:orientation="vertical"
+            android:padding="32dp">
 
-        <Button
-            android:id="@+id/btnShop"
-            android:layout_width="160dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="#FF2A2A40"
-            android:text="🛒 Bomb Shop"
-            android:textColor="#AAAACC"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/app_name"
+                android:textColor="#FFFFFF"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                android:shadowColor="#AA000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="6" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/subtitle"
+                android:textColor="#CCCCEE"
+                android:textSize="16sp"
+                android:shadowColor="#AA000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="4" />
+
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="220dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="48dp"
+                android:backgroundTint="#FF6200EE"
+                android:text="@string/play"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:text="@string/controls_hint"
+                android:textColor="#99AABB"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnShop"
+                android:layout_width="160dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="40dp"
+                android:backgroundTint="#AA2A2A40"
+                android:text="🛒 Bomb Shop"
+                android:textColor="#AAAACC"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </FrameLayout>

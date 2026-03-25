@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var gameView: GameView
-    private lateinit var startOverlay: LinearLayout
+    private lateinit var startOverlay: FrameLayout
     private lateinit var controlsBar: LinearLayout
     private lateinit var btnStart: Button
     private lateinit var btnPause: Button

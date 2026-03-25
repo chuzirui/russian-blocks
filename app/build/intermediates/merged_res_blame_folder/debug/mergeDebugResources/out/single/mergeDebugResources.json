@@ -4,16 +4,28 @@
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
+        "merged": "com.russianblocks.game.app-debug-4:/layout_activity_main.xml.flat",
+        "source": "com.russianblocks.game.app-main-6:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xhdpi_splash_bg.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xhdpi/splash_bg.png"
+    },
+    {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-xhdpi_ic_launcher_round.png.flat",
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable/ic_launcher_foreground.xml"
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-mdpi_splash_bg.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-mdpi/splash_bg.png"
     },
     {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-mdpi_ic_launcher_round.png.flat",
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xxhdpi_splash_icon.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xxhdpi/splash_icon.png"
     },
     {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
@@ -28,16 +40,24 @@
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xhdpi_splash_icon.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xhdpi/splash_icon.png"
+    },
+    {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable_ic_launcher_background.xml.flat",
-        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable/ic_launcher_background.xml"
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-hdpi_splash_icon.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-hdpi/splash_icon.png"
     },
     {
-        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-mdpi_splash_icon.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-mdpi/splash_icon.png"
+    },
+    {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-hdpi_splash_bg.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-hdpi/splash_bg.png"
     },
     {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/layout_activity_main.xml.flat",
@@ -48,8 +68,20 @@
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xxxhdpi_splash_icon.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xxxhdpi/splash_icon.png"
+    },
+    {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xxhdpi_splash_bg.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xxhdpi/splash_bg.png"
+    },
+    {
+        "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/drawable-xxxhdpi_splash_bg.png.flat",
+        "source": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-main-6:/drawable-xxxhdpi/splash_bg.png"
     },
     {
         "merged": "/root/.gradle/daemon/9.3.1/com.russianblocks.game.app-debug-4:/mipmap-mdpi_ic_launcher.png.flat",

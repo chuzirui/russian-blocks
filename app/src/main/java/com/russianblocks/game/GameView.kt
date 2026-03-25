@@ -383,4 +383,8 @@ class GameView @JvmOverloads constructor(
         highScoreBrokenCallback?.invoke(newHighScore)
         postInvalidate()
     }
+
+    override fun onBombCascadeTick() {
+        handler.postDelayed({ engine.bombCascadeStep() }, 300)
+    }
 }

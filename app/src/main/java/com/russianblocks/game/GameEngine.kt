@@ -12,6 +12,7 @@ class GameEngine(private val listener: GameListener) {
         fun onBoardUpdated()
         fun onBombCountChanged(bombs: Int)
         fun onHighScoreBroken(newHighScore: Int)
+        fun onBombCascadeTick()
     }
 
     val board = Board()
@@ -53,7 +54,7 @@ class GameEngine(private val listener: GameListener) {
     /* ── Actions ────────────────────────────────────────── */
 
     fun moveLeft() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         if (board.isValidPosition(p.blocks, p.x - 1, p.y)) {
             p.x--
@@ -63,7 +64,7 @@ class GameEngine(private val listener: GameListener) {
     }
 
     fun moveRight() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         if (board.isValidPosition(p.blocks, p.x + 1, p.y)) {
             p.x++
@@ -73,7 +74,7 @@ class GameEngine(private val listener: GameListener) {
     }
 
     fun rotateCW() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         val rotated = p.rotatedCW()
         if (tryWallKick(p, rotated)) {
@@ -84,7 +85,7 @@ class GameEngine(private val listener: GameListener) {
     }
 
     fun softDrop() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         if (board.isValidPosition(p.blocks, p.x, p.y + 1)) {
             p.y++
@@ -96,7 +97,7 @@ class GameEngine(private val listener: GameListener) {
     }
 
     fun hardDrop() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         var rows = 0
         while (board.isValidPosition(p.blocks, p.x, p.y + 1)) {
@@ -112,8 +113,10 @@ class GameEngine(private val listener: GameListener) {
      * Uses a bomb: removes all blocks of the most common color,
      * applies gravity, and clears any resulting lines.
      */
+    private var bombAnimating = false
+
     fun useBomb() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         if (bombs <= 0) return
         val color = board.getMostCommonColor()
         if (color == 0) return
@@ -122,23 +125,39 @@ class GameEngine(private val listener: GameListener) {
         listener.onBombCountChanged(bombs)
 
         board.removeColor(color)
+        listener.onBoardUpdated()
+        bombAnimating = true
+
+        bombCascadeStep()
+    }
+
+    /**
+     * One step of the bomb cascade: gravity → clear → repeat.
+     * Called with a delay between steps so the player sees each stage.
+     */
+    fun bombCascadeStep() {
         board.applyGravity()
-        var cleared = board.clearLines()
-        while (cleared > 0) {
+        listener.onBoardUpdated()
+
+        val cleared = board.clearLines()
+        if (cleared > 0) {
             totalLines += cleared
             score += lineScore(cleared) * level
             level = (totalLines / 10) + 1
-            board.applyGravity()
-            cleared = board.clearLines()
+            checkHighScore()
+            listener.onScoreChanged(score, level, totalLines)
+            listener.onBoardUpdated()
+            listener.onBombCascadeTick()
+        } else {
+            bombAnimating = false
+            checkHighScore()
+            listener.onScoreChanged(score, level, totalLines)
         }
-        checkHighScore()
-        listener.onScoreChanged(score, level, totalLines)
-        listener.onBoardUpdated()
     }
 
     /** Called by the game loop at each drop interval */
     fun tick() {
-        if (isGameOver || isPaused) return
+        if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         if (board.isValidPosition(p.blocks, p.x, p.y + 1)) {
             p.y++
