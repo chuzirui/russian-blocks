@@ -1,6 +1,6 @@
 package com.russianblocks.game
 
-class Board(val width: Int = 12, val height: Int = 24) {
+class Board(val width: Int = 10, val height: Int = 21) {
 
     /* Each cell is 0 (empty) or a packed ARGB color */
     val grid: Array<IntArray> = Array(height) { IntArray(width) }
@@ -55,25 +55,68 @@ class Board(val width: Int = 12, val height: Int = 24) {
     }
 
     /**
-     * Per-column gravity: drops every block down to fill empty
-     * cells below it. Returns true if anything moved.
+     * Connected-component gravity: finds groups of connected blocks
+     * and drops each group as a whole unit only if nothing supports it.
+     * Repeats until everything is settled. Returns true if anything moved.
      */
     fun applyGravity(): Boolean {
-        var moved = false
-        for (c in 0 until width) {
-            var dest = height - 1
-            for (r in height - 1 downTo 0) {
-                if (grid[r][c] != 0) {
-                    if (dest != r) {
-                        grid[dest][c] = grid[r][c]
-                        grid[r][c] = 0
-                        moved = true
+        var anyMoved = false
+        var moved: Boolean
+        do {
+            moved = false
+            val components = findComponents()
+            for (comp in components.sortedByDescending { it.maxOf { (r, _) -> r } }) {
+                val cells = comp.toSet()
+                var minDrop = height
+                for ((r, c) in cells) {
+                    var d = 0
+                    var nr = r + 1
+                    while (nr < height && (grid[nr][c] == 0 || (nr to c) in cells)) {
+                        d++
+                        nr++
                     }
-                    dest--
+                    minDrop = minOf(minDrop, d)
+                }
+                if (minDrop > 0) {
+                    val saved = comp.map { (r, c) -> Triple(r, c, grid[r][c]) }
+                    for ((r, c, _) in saved) grid[r][c] = 0
+                    for ((r, c, color) in saved) grid[r + minDrop][c] = color
+                    moved = true
+                    anyMoved = true
+                }
+            }
+        } while (moved)
+        return anyMoved
+    }
+
+    private fun findComponents(): List<List<Pair<Int, Int>>> {
+        val visited = Array(height) { BooleanArray(width) }
+        val result = mutableListOf<List<Pair<Int, Int>>>()
+        for (r in 0 until height) {
+            for (c in 0 until width) {
+                if (grid[r][c] != 0 && !visited[r][c]) {
+                    val comp = mutableListOf<Pair<Int, Int>>()
+                    val queue = ArrayDeque<Pair<Int, Int>>()
+                    queue.add(r to c)
+                    visited[r][c] = true
+                    while (queue.isNotEmpty()) {
+                        val (cr, cc) = queue.removeFirst()
+                        comp.add(cr to cc)
+                        for ((dr, dc) in arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)) {
+                            val nr = cr + dr
+                            val nc = cc + dc
+                            if (nr in 0 until height && nc in 0 until width
+                                && grid[nr][nc] != 0 && !visited[nr][nc]) {
+                                visited[nr][nc] = true
+                                queue.add(nr to nc)
+                            }
+                        }
+                    }
+                    result.add(comp)
                 }
             }
         }
-        return moved
+        return result
     }
 
     fun reset() {
