@@ -4,7 +4,17 @@
             "outputFile": "com.russianblocks.game.app-mergeDebugResources-2:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "/root/.gradle/caches/8.13/transforms/dfad4ce898dc48d21fe656d439886134/transformed/appcompat-1.6.1/res/values-v16/values-v16.xml",
+                    "source": "/root/.gradle/caches/9.3.1/transforms/5c3f3a42f4d77b73ec5357655c17e0b5/transformed/core-1.12.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "/root/.gradle/caches/9.3.1/transforms/e32e3b5c9fc555f20c204ef7026e2f51/transformed/appcompat-1.6.1/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -20,16 +30,6 @@
                         "endLines": "6",
                         "endColumns": "12",
                         "endOffsets": "289"
-                    }
-                },
-                {
-                    "source": "/root/.gradle/caches/8.13/transforms/588f541e696055c79e4c9c1867521cfd/transformed/core-1.12.0/res/values-v16/values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
                     }
                 }
             ]

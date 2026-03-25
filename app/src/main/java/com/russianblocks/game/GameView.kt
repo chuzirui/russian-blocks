@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Shader
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
@@ -24,8 +21,6 @@ class GameView @JvmOverloads constructor(
     private val handler = Handler(Looper.getMainLooper())
 
     private val cellPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val bevelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val shinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.rgb(30, 30, 42)
         style = Paint.Style.STROKE
@@ -36,7 +31,6 @@ class GameView @JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeWidth = 2f
     }
-    private val bgPaint = Paint().apply { color = Color.rgb(16, 16, 26) }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         textSize = 40f
@@ -48,7 +42,6 @@ class GameView @JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeWidth = 2f
     }
-    private val bevelPath = Path()
 
     private var cellSize = 0f
     private var boardLeft = 0f
@@ -57,6 +50,8 @@ class GameView @JvmOverloads constructor(
 
     var scoreCallback: ((score: Int, level: Int, lines: Int) -> Unit)? = null
     var gameOverCallback: ((finalScore: Int) -> Unit)? = null
+    var bombCountCallback: ((bombs: Int) -> Unit)? = null
+    var highScoreBrokenCallback: ((newHighScore: Int) -> Unit)? = null
 
     private val tickRunnable = object : Runnable {
         override fun run() {
@@ -140,6 +135,15 @@ class GameView @JvmOverloads constructor(
     fun rotateCW()  = engine.rotateCW()
     fun softDrop()  = engine.softDrop()
     fun hardDrop()  = engine.hardDrop()
+    fun useBomb()   = engine.useBomb()
+
+    var highScore: Int
+        get() = engine.highScore
+        set(value) { engine.highScore = value }
+
+    var bombs: Int
+        get() = engine.bombs
+        set(value) { engine.bombs = value }
 
     /* ── Layout ─────────────────────────────────────────── */
 
@@ -178,7 +182,8 @@ class GameView @JvmOverloads constructor(
         val boardW = cellSize * engine.board.width
         val boardH = cellSize * engine.board.height
 
-        canvas.drawRect(boardLeft, boardTop, boardLeft + boardW, boardTop + boardH, bgPaint)
+        cellPaint.color = Color.rgb(16, 16, 26)
+        canvas.drawRect(boardLeft, boardTop, boardLeft + boardW, boardTop + boardH, cellPaint)
 
         for (r in 0 until engine.board.height) {
             for (c in 0 until engine.board.width) {
@@ -226,108 +231,41 @@ class GameView @JvmOverloads constructor(
     }
 
     private fun drawCell(canvas: Canvas, x: Float, y: Float, color: Int) {
-        val r = Color.red(color)
-        val g = Color.green(color)
-        val b = Color.blue(color)
-        val bevel = (cellSize * 0.15f).coerceAtLeast(2f)
-        val gap = 1f
-
+        val gap = 1.5f
         val left = x + gap
         val top = y + gap
         val right = x + cellSize - gap
         val bottom = y + cellSize - gap
 
-        /* outer dark border */
-        cellPaint.color = Color.rgb((r * 0.3f).toInt(), (g * 0.3f).toInt(), (b * 0.3f).toInt())
+        cellPaint.color = color
         canvas.drawRect(left, top, right, bottom, cellPaint)
 
-        /* light bevel — top & left trapezoid */
-        bevelPaint.color = Color.rgb(
-            (r + (255 - r) * 0.45f).toInt().coerceAtMost(255),
-            (g + (255 - g) * 0.45f).toInt().coerceAtMost(255),
-            (b + (255 - b) * 0.45f).toInt().coerceAtMost(255)
-        )
-        bevelPath.reset()
-        bevelPath.moveTo(left, top)
-        bevelPath.lineTo(right, top)
-        bevelPath.lineTo(right - bevel, top + bevel)
-        bevelPath.lineTo(left + bevel, top + bevel)
-        bevelPath.close()
-        canvas.drawPath(bevelPath, bevelPaint)
-
-        bevelPath.reset()
-        bevelPath.moveTo(left, top)
-        bevelPath.lineTo(left, bottom)
-        bevelPath.lineTo(left + bevel, bottom - bevel)
-        bevelPath.lineTo(left + bevel, top + bevel)
-        bevelPath.close()
-        canvas.drawPath(bevelPath, bevelPaint)
-
-        /* dark bevel — bottom & right trapezoid */
-        bevelPaint.color = Color.rgb((r * 0.45f).toInt(), (g * 0.45f).toInt(), (b * 0.45f).toInt())
-        bevelPath.reset()
-        bevelPath.moveTo(right, bottom)
-        bevelPath.lineTo(left, bottom)
-        bevelPath.lineTo(left + bevel, bottom - bevel)
-        bevelPath.lineTo(right - bevel, bottom - bevel)
-        bevelPath.close()
-        canvas.drawPath(bevelPath, bevelPaint)
-
-        bevelPath.reset()
-        bevelPath.moveTo(right, bottom)
-        bevelPath.lineTo(right, top)
-        bevelPath.lineTo(right - bevel, top + bevel)
-        bevelPath.lineTo(right - bevel, bottom - bevel)
-        bevelPath.close()
-        canvas.drawPath(bevelPath, bevelPaint)
-
-        /* main face */
-        cellPaint.color = color
-        canvas.drawRect(left + bevel, top + bevel, right - bevel, bottom - bevel, cellPaint)
-
-        /* top gloss gradient */
-        val glossH = (bottom - top) * 0.4f
-        shinePaint.shader = LinearGradient(
-            left + bevel, top + bevel,
-            left + bevel, top + bevel + glossH,
-            Color.argb(100, 255, 255, 255),
-            Color.argb(0, 255, 255, 255),
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawRect(left + bevel, top + bevel, right - bevel, top + bevel + glossH, shinePaint)
-        shinePaint.shader = null
-    }
-
-    private fun drawCellSmall(canvas: Canvas, x: Float, y: Float, size: Float, color: Int) {
         val r = Color.red(color)
         val g = Color.green(color)
         val b = Color.blue(color)
-        val bevel = (size * 0.14f).coerceAtLeast(1.5f)
-        val gap = 0.5f
+        borderPaint.color = Color.rgb(
+            (r * 0.55f).toInt(), (g * 0.55f).toInt(), (b * 0.55f).toInt()
+        )
+        canvas.drawRect(left, top, right, bottom, borderPaint)
+    }
 
+    private fun drawCellSmall(canvas: Canvas, x: Float, y: Float, size: Float, color: Int) {
+        val gap = 1f
         val left = x + gap
         val top = y + gap
         val right = x + size - gap
         val bottom = y + size - gap
 
-        cellPaint.color = Color.rgb((r * 0.35f).toInt(), (g * 0.35f).toInt(), (b * 0.35f).toInt())
+        cellPaint.color = color
         canvas.drawRect(left, top, right, bottom, cellPaint)
 
-        /* light top edge */
-        bevelPaint.color = Color.rgb(
-            (r + (255 - r) * 0.35f).toInt().coerceAtMost(255),
-            (g + (255 - g) * 0.35f).toInt().coerceAtMost(255),
-            (b + (255 - b) * 0.35f).toInt().coerceAtMost(255)
+        val r = Color.red(color)
+        val g = Color.green(color)
+        val b = Color.blue(color)
+        borderPaint.color = Color.rgb(
+            (r * 0.55f).toInt(), (g * 0.55f).toInt(), (b * 0.55f).toInt()
         )
-        canvas.drawRect(left, top, right, top + bevel, bevelPaint)
-
-        /* dark bottom edge */
-        bevelPaint.color = Color.rgb((r * 0.5f).toInt(), (g * 0.5f).toInt(), (b * 0.5f).toInt())
-        canvas.drawRect(left, bottom - bevel, right, bottom, bevelPaint)
-
-        /* face */
-        cellPaint.color = color
-        canvas.drawRect(left + bevel, top + bevel, right - bevel, bottom - bevel, cellPaint)
+        canvas.drawRect(left, top, right, bottom, borderPaint)
     }
 
     private fun drawSidePanel(canvas: Canvas) {
@@ -370,37 +308,53 @@ class GameView @JvmOverloads constructor(
         }
 
         val statsTop = panelTop + previewSize + 24f
+        val statsH = cellSize * 9.5f
         canvas.drawRoundRect(
-            panelLeft, statsTop, panelLeft + sideWidth, statsTop + cellSize * 6,
+            panelLeft, statsTop, panelLeft + sideWidth, statsTop + statsH,
             12f, 12f, panelPaint
         )
         canvas.drawRoundRect(
-            panelLeft, statsTop, panelLeft + sideWidth, statsTop + cellSize * 6,
+            panelLeft, statsTop, panelLeft + sideWidth, statsTop + statsH,
             12f, 12f, borderPaint
         )
 
-        val lineH = cellSize * 1.1f
+        val lineH = cellSize * 0.95f
         var ty = statsTop + lineH
 
         textPaint.color = Color.rgb(120, 120, 160)
         canvas.drawText("SCORE", cx, ty, textPaint)
-        ty += lineH * 0.8f
+        ty += lineH * 0.75f
         textPaint.color = Color.WHITE
         canvas.drawText("${engine.score}", cx, ty, textPaint)
 
         ty += lineH
         textPaint.color = Color.rgb(120, 120, 160)
+        canvas.drawText("BEST", cx, ty, textPaint)
+        ty += lineH * 0.75f
+        textPaint.color = if (engine.score > engine.highScore && engine.highScore > 0)
+            Color.rgb(255, 215, 0) else Color.rgb(180, 180, 200)
+        canvas.drawText("${maxOf(engine.highScore, engine.score)}", cx, ty, textPaint)
+
+        ty += lineH
+        textPaint.color = Color.rgb(120, 120, 160)
         canvas.drawText("LEVEL", cx, ty, textPaint)
-        ty += lineH * 0.8f
+        ty += lineH * 0.75f
         textPaint.color = Color.WHITE
         canvas.drawText("${engine.level}", cx, ty, textPaint)
 
         ty += lineH
         textPaint.color = Color.rgb(120, 120, 160)
         canvas.drawText("LINES", cx, ty, textPaint)
-        ty += lineH * 0.8f
+        ty += lineH * 0.75f
         textPaint.color = Color.WHITE
         canvas.drawText("${engine.totalLines}", cx, ty, textPaint)
+
+        ty += lineH
+        textPaint.color = Color.rgb(120, 120, 160)
+        canvas.drawText("BOMB", cx, ty, textPaint)
+        ty += lineH * 0.75f
+        textPaint.color = if (engine.bombs > 0) Color.rgb(255, 80, 80) else Color.rgb(60, 60, 80)
+        canvas.drawText("${engine.bombs}", cx, ty, textPaint)
     }
 
     /* ── Engine callbacks ───────────────────────────────── */
@@ -417,6 +371,16 @@ class GameView @JvmOverloads constructor(
     }
 
     override fun onBoardUpdated() {
+        postInvalidate()
+    }
+
+    override fun onBombCountChanged(bombs: Int) {
+        bombCountCallback?.invoke(bombs)
+        postInvalidate()
+    }
+
+    override fun onHighScoreBroken(newHighScore: Int) {
+        highScoreBrokenCallback?.invoke(newHighScore)
         postInvalidate()
     }
 }

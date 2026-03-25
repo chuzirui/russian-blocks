@@ -17,6 +17,16 @@ enum class TetrominoShape(val color: Int, val blocks: Array<IntArray>) {
         intArrayOf(1, 1)
     )),
 
+    SLASH2(Color.rgb(220, 180, 140), arrayOf(
+        intArrayOf(0, 1),
+        intArrayOf(1, 0)
+    )),
+
+    BSLASH2(Color.rgb(140, 180, 220), arrayOf(
+        intArrayOf(1, 0),
+        intArrayOf(0, 1)
+    )),
+
     /* ── 3 blocks ───────────────────────────────────────── */
 
     I3(Color.rgb(180, 255, 0), arrayOf(
@@ -28,6 +38,23 @@ enum class TetrominoShape(val color: Int, val blocks: Array<IntArray>) {
     V3(Color.rgb(0, 190, 170), arrayOf(
         intArrayOf(1, 0),
         intArrayOf(1, 1)
+    )),
+
+    S3(Color.rgb(160, 230, 200), arrayOf(
+        intArrayOf(0, 1),
+        intArrayOf(1, 1)
+    )),
+
+    SLASH3(Color.rgb(255, 160, 100), arrayOf(
+        intArrayOf(0, 0, 1),
+        intArrayOf(0, 1, 0),
+        intArrayOf(1, 0, 0)
+    )),
+
+    BSLASH3(Color.rgb(100, 160, 255), arrayOf(
+        intArrayOf(1, 0, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 0, 1)
     )),
 
     /* ── 4 blocks (standard tetrominoes) ────────────────── */
@@ -102,6 +129,36 @@ enum class TetrominoShape(val color: Int, val blocks: Array<IntArray>) {
         intArrayOf(1, 1, 1),
         intArrayOf(0, 1, 0),
         intArrayOf(0, 1, 0)
+    )),
+
+    S5(Color.rgb(200, 100, 180), arrayOf(
+        intArrayOf(0, 1, 1),
+        intArrayOf(0, 1, 0),
+        intArrayOf(1, 1, 0)
+    )),
+
+    Z5(Color.rgb(100, 200, 160), arrayOf(
+        intArrayOf(1, 1, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 1)
+    )),
+
+    P5(Color.rgb(230, 140, 50), arrayOf(
+        intArrayOf(1, 0, 0),
+        intArrayOf(1, 1, 0),
+        intArrayOf(1, 1, 0)
+    )),
+
+    Q5(Color.rgb(50, 180, 230), arrayOf(
+        intArrayOf(0, 0, 1),
+        intArrayOf(0, 1, 1),
+        intArrayOf(0, 1, 1)
+    )),
+
+    U5(Color.rgb(255, 200, 60), arrayOf(
+        intArrayOf(1, 0, 1),
+        intArrayOf(1, 1, 1),
+        intArrayOf(0, 0, 0)
     )),
 
     /* ── 6 blocks (hexominoes) ──────────────────────────── */

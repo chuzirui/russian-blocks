@@ -7,6 +7,8 @@
     <string name="resume">RESUME</string>
     <string name="game_over">Game Over</string>
     <string name="final_score">Score: %d</string>
+    <string name="final_score_best">Score: %d\n\nNew High Score!</string>
+    <string name="final_score_with_best">Score: %d\nBest: %d</string>
     <string name="play_again">Play Again</string>
     <string name="quit">Quit</string>
     <string name="controls_hint">Use the buttons below to play\nor swipe on the board</string>

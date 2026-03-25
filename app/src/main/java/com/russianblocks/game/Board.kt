@@ -119,6 +119,36 @@ class Board(val width: Int = 10, val height: Int = 21) {
         return result
     }
 
+    /**
+     * Returns the most common non-empty color on the board, or 0 if empty.
+     */
+    fun getMostCommonColor(): Int {
+        val counts = mutableMapOf<Int, Int>()
+        for (r in 0 until height) {
+            for (c in 0 until width) {
+                val color = grid[r][c]
+                if (color != 0) counts[color] = (counts[color] ?: 0) + 1
+            }
+        }
+        return counts.maxByOrNull { it.value }?.key ?: 0
+    }
+
+    /**
+     * Removes all cells of the given color. Returns count removed.
+     */
+    fun removeColor(color: Int): Int {
+        var count = 0
+        for (r in 0 until height) {
+            for (c in 0 until width) {
+                if (grid[r][c] == color) {
+                    grid[r][c] = 0
+                    count++
+                }
+            }
+        }
+        return count
+    }
+
     fun reset() {
         for (row in grid) row.fill(0)
     }

@@ -1,6 +1,7 @@
 package com.russianblocks.game
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -23,12 +25,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "RussianBlocks"
+        private const val PREFS_NAME = "russian_blocks_prefs"
+        private const val KEY_HIGH_SCORE = "high_score"
+        private const val KEY_BOMBS = "bombs"
 
-        /*
-         * These are Google's official test ad unit IDs.
-         * Replace with your real IDs before publishing to the Play Store.
-         * https://developers.google.com/admob/android/test-ads
-         */
         private const val BANNER_AD_UNIT    = "ca-app-pub-3940256099942544/6300978111"
         private const val INTERSTITIAL_UNIT = "ca-app-pub-3940256099942544/1033173712"
     }
@@ -38,10 +38,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var controlsBar: LinearLayout
     private lateinit var btnStart: Button
     private lateinit var btnPause: Button
+    private lateinit var btnBomb: Button
     private lateinit var adBanner: AdView
 
     private var interstitialAd: InterstitialAd? = null
     private var gamesPlayed = 0
+    private lateinit var billingManager: BillingManager
 
     private val repeatHandler = Handler(Looper.getMainLooper())
     private val repeatDelay = 120L
@@ -59,15 +61,30 @@ class MainActivity : AppCompatActivity() {
         controlsBar = findViewById(R.id.controlsBar)
         btnStart = findViewById(R.id.btnStart)
         btnPause = findViewById(R.id.btnPause)
+        btnBomb = findViewById(R.id.btnBomb)
         adBanner = findViewById(R.id.adBanner)
 
+        gameView.highScore = loadHighScore()
+
+        billingManager = BillingManager(this) { amount ->
+            addBombs(amount)
+            Toast.makeText(this, "+$amount Bombs!", Toast.LENGTH_SHORT).show()
+        }
+        billingManager.connect()
+
         initAds()
+
+        findViewById<Button>(R.id.btnShop).setOnClickListener {
+            showShopDialog()
+        }
 
         btnStart.setOnClickListener {
             startOverlay.visibility = View.GONE
             controlsBar.visibility = View.VISIBLE
             adBanner.visibility = View.VISIBLE
+            gameView.highScore = loadHighScore()
             gameView.startGame()
+            loadBombsIntoEngine()
         }
 
         btnPause.setOnClickListener {
@@ -80,6 +97,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        btnBomb.setOnClickListener {
+            if (gameView.bombs > 0) {
+                gameView.useBomb()
+            }
+        }
+
         setupRepeatingButton(R.id.btnLeft)  { gameView.moveLeft() }
         setupRepeatingButton(R.id.btnRight) { gameView.moveRight() }
         setupRepeatingButton(R.id.btnDown)  { gameView.softDrop() }
@@ -87,11 +110,100 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnRotate).setOnClickListener { gameView.rotateCW() }
         findViewById<Button>(R.id.btnDrop).setOnClickListener   { gameView.hardDrop() }
 
+        gameView.bombCountCallback = { bombs ->
+            runOnUiThread {
+                saveBombs(bombs)
+                updateBombButton(bombs)
+            }
+        }
+
+        gameView.highScoreBrokenCallback = { newScore ->
+            runOnUiThread {
+                saveBombs(gameView.bombs)
+                Toast.makeText(this, "NEW HIGH SCORE! Bomb earned!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         gameView.gameOverCallback = { finalScore ->
             runOnUiThread {
                 gamesPlayed++
+                saveHighScore(finalScore)
                 showGameOverWithAd(finalScore)
             }
+        }
+    }
+
+    /* ── High Score ─────────────────────────────────────── */
+
+    private fun loadHighScore(): Int {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getInt(KEY_HIGH_SCORE, 0)
+    }
+
+    private fun saveHighScore(score: Int) {
+        val current = loadHighScore()
+        if (score > current) {
+            getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().putInt(KEY_HIGH_SCORE, score).apply()
+            gameView.highScore = score
+        }
+    }
+
+    /* ── Bomb persistence ────────────────────────────────── */
+
+    private fun loadBombs(): Int {
+        return getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_BOMBS, 0)
+    }
+
+    private fun saveBombs(count: Int) {
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_BOMBS, count).apply()
+    }
+
+    private fun loadBombsIntoEngine() {
+        val saved = loadBombs()
+        gameView.bombs = saved
+        updateBombButton(saved)
+    }
+
+    private fun addBombs(amount: Int) {
+        gameView.bombs += amount
+        saveBombs(gameView.bombs)
+        updateBombButton(gameView.bombs)
+    }
+
+    /* ── Shop ─────────────────────────────────────────────── */
+
+    private fun showShopDialog(onClose: (() -> Unit)? = null) {
+        val products = BillingManager.PRODUCTS
+        val items = products.map { "${it.title}  —  ${it.price}" }.toTypedArray()
+
+        AlertDialog.Builder(this, R.style.GameOverDialog)
+            .setTitle("\uD83D\uDCA3 Bomb Shop")
+            .setItems(items) { _, which ->
+                billingManager.launchPurchase(products[which].id)
+                onClose?.invoke()
+            }
+            .setNegativeButton("Close") { _, _ ->
+                onClose?.invoke()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    /* ── Bomb Button ────────────────────────────────────── */
+
+    private fun updateBombButton(bombs: Int) {
+        btnBomb.isEnabled = bombs > 0
+        if (bombs > 0) {
+            btnBomb.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFCC2222.toInt())
+            btnBomb.text = "\uD83D\uDCA3 $bombs"
+            btnBomb.setTextColor(0xFFFFFFFF.toInt())
+        } else {
+            btnBomb.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF331111.toInt())
+            btnBomb.text = "\uD83D\uDCA3"
+            btnBomb.setTextColor(0xFF666666.toInt())
         }
     }
 
@@ -144,12 +256,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showGameOverDialog(finalScore: Int) {
+        val highScore = loadHighScore()
+        val isNewBest = finalScore >= highScore
+        val msg = if (isNewBest)
+            getString(R.string.final_score_best, finalScore)
+        else
+            getString(R.string.final_score_with_best, finalScore, highScore)
+
         AlertDialog.Builder(this, R.style.GameOverDialog)
             .setTitle(getString(R.string.game_over))
-            .setMessage(getString(R.string.final_score, finalScore))
+            .setMessage(msg)
             .setPositiveButton(getString(R.string.play_again)) { _, _ ->
+                gameView.highScore = loadHighScore()
                 gameView.startGame()
+                loadBombsIntoEngine()
                 btnPause.text = getString(R.string.pause)
+            }
+            .setNeutralButton("\uD83D\uDCA3 Buy Bombs") { _, _ ->
+                showShopDialog { showGameOverDialog(finalScore) }
             }
             .setNegativeButton(getString(R.string.quit)) { _, _ ->
                 controlsBar.visibility = View.GONE
@@ -209,6 +333,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         adBanner.destroy()
+        billingManager.destroy()
         super.onDestroy()
     }
 

@@ -3051,8 +3051,6 @@ drawable ic_call_decline_low
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
 drawable ic_keyboard_black_24dp
-drawable ic_launcher_background
-drawable ic_launcher_foreground
 drawable ic_m3_chip_check
 drawable ic_m3_chip_checked_circle
 drawable ic_m3_chip_close
@@ -3244,12 +3242,14 @@ id browser_actions_menu_item_icon
 id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
+id btnBomb
 id btnDown
 id btnDrop
 id btnLeft
 id btnPause
 id btnRight
 id btnRotate
+id btnShop
 id btnStart
 id buttonPanel
 id cache_measures
@@ -3860,7 +3860,10 @@ layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
 mipmap ic_launcher
+mipmap ic_launcher_round
 plurals mtrl_badge_content_description
+raw com_android_billingclient_heterodyne_info
+raw com_android_billingclient_registration_info
 string abc_action_bar_home_description
 string abc_action_bar_up_description
 string abc_action_menu_overflow_description
@@ -3937,6 +3940,8 @@ string fallback_menu_item_copy_link
 string fallback_menu_item_open_in_browser
 string fallback_menu_item_share_link
 string final_score
+string final_score_best
+string final_score_with_best
 string game_over
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
@@ -5356,5 +5361,6 @@ styleable ViewPager2 android_orientation
 styleable ViewStubCompat android_id android_layout android_inflatedId
 styleable ViewTransition android_id SharedValue SharedValueId clearsTag duration ifTagNotSet ifTagSet motionInterpolator motionTarget onStateTransition pathMotionArc setsTag transitionDisable upDuration viewTransitionMode
 styleable include constraintSet
+xml com_android_billingclient_phenotype
 xml gma_ad_services_config
 xml image_share_filepaths

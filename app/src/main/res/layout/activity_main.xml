@@ -113,6 +113,18 @@
                     android:textSize="20sp" />
 
                 <Button
+                    android:id="@+id/btnBomb"
+                    android:layout_width="0dp"
+                    android:layout_height="58dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    android:backgroundTint="#FF331111"
+                    android:text="💣"
+                    android:textColor="#666666"
+                    android:textSize="20sp"
+                    android:enabled="false" />
+
+                <Button
                     android:id="@+id/btnPause"
                     android:layout_width="0dp"
                     android:layout_height="58dp"
@@ -175,6 +187,16 @@
             android:text="@string/controls_hint"
             android:textColor="#666680"
             android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnShop"
+            android:layout_width="160dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="#FF2A2A40"
+            android:text="🛒 Bomb Shop"
+            android:textColor="#AAAACC"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

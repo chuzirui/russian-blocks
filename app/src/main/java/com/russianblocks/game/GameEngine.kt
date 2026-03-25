@@ -10,6 +10,8 @@ class GameEngine(private val listener: GameListener) {
         fun onScoreChanged(score: Int, level: Int, lines: Int)
         fun onGameOver(finalScore: Int)
         fun onBoardUpdated()
+        fun onBombCountChanged(bombs: Int)
+        fun onHighScoreBroken(newHighScore: Int)
     }
 
     val board = Board()
@@ -26,6 +28,10 @@ class GameEngine(private val listener: GameListener) {
     var isGameOver: Boolean = false; private set
     var isPaused: Boolean = false
 
+    var highScore: Int = 0
+    var bombs: Int = 0
+    private var highScoreBrokenThisGame = false
+
     /** Drop interval in ms — speeds up with level */
     val dropInterval: Long
         get() = (1000L - (level - 1) * 80L).coerceAtLeast(100L)
@@ -37,9 +43,11 @@ class GameEngine(private val listener: GameListener) {
         totalLines = 0
         isGameOver = false
         isPaused = false
+        highScoreBrokenThisGame = false
         nextShape = TetrominoShape.random()
         spawnPiece()
         listener.onScoreChanged(score, level, totalLines)
+        listener.onBombCountChanged(bombs)
     }
 
     /* ── Actions ────────────────────────────────────────── */
@@ -81,6 +89,7 @@ class GameEngine(private val listener: GameListener) {
         if (board.isValidPosition(p.blocks, p.x, p.y + 1)) {
             p.y++
             score += 1
+            checkHighScore()
             listener.onScoreChanged(score, level, totalLines)
             listener.onBoardUpdated()
         }
@@ -95,7 +104,36 @@ class GameEngine(private val listener: GameListener) {
             rows++
         }
         score += rows * 2
+        checkHighScore()
         lockAndAdvance()
+    }
+
+    /**
+     * Uses a bomb: removes all blocks of the most common color,
+     * applies gravity, and clears any resulting lines.
+     */
+    fun useBomb() {
+        if (isGameOver || isPaused) return
+        if (bombs <= 0) return
+        val color = board.getMostCommonColor()
+        if (color == 0) return
+
+        bombs--
+        listener.onBombCountChanged(bombs)
+
+        board.removeColor(color)
+        board.applyGravity()
+        var cleared = board.clearLines()
+        while (cleared > 0) {
+            totalLines += cleared
+            score += lineScore(cleared) * level
+            level = (totalLines / 10) + 1
+            board.applyGravity()
+            cleared = board.clearLines()
+        }
+        checkHighScore()
+        listener.onScoreChanged(score, level, totalLines)
+        listener.onBoardUpdated()
     }
 
     /** Called by the game loop at each drop interval */
@@ -130,7 +168,6 @@ class GameEngine(private val listener: GameListener) {
         val p = currentPiece ?: return
         board.lock(p)
 
-        /* Only apply gravity when lines are actually cleared */
         var totalCleared = 0
         var cleared = board.clearLines()
         while (cleared > 0) {
@@ -144,8 +181,18 @@ class GameEngine(private val listener: GameListener) {
             score += lineScore(totalCleared) * level
             level = (totalLines / 10) + 1
         }
+        checkHighScore()
         listener.onScoreChanged(score, level, totalLines)
         spawnPiece()
+    }
+
+    private fun checkHighScore() {
+        if (!highScoreBrokenThisGame && score > highScore && highScore > 0) {
+            highScoreBrokenThisGame = true
+            bombs++
+            listener.onBombCountChanged(bombs)
+            listener.onHighScoreBroken(score)
+        }
     }
 
     private fun lineScore(lines: Int): Int = when {
@@ -166,11 +213,11 @@ class GameEngine(private val listener: GameListener) {
     }
 
     private fun tryWallKick(piece: Tetromino, rotated: Array<IntArray>): Boolean {
-        val maxKick = rotated.size / 2 + 1
-        for (dx in 0..maxKick) {
-            for (offset in if (dx == 0) intArrayOf(0) else intArrayOf(-dx, dx)) {
-                if (board.isValidPosition(rotated, piece.x + offset, piece.y)) {
-                    piece.x += offset
+        for (dx in intArrayOf(0, -1, 1, -2, 2)) {
+            for (dy in intArrayOf(0, -1, 1)) {
+                if (board.isValidPosition(rotated, piece.x + dx, piece.y + dy)) {
+                    piece.x += dx
+                    piece.y += dy
                     return true
                 }
             }
