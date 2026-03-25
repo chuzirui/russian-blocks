@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.russianblocks.game.app-mergeDebugResources-2:/values-ldltr-v21/values-ldltr-v21.xml",
+            "map": [
+                {
+                    "source": "/root/.gradle/caches/8.13/transforms/dfad4ce898dc48d21fe656d439886134/transformed/appcompat-1.6.1/res/values-ldltr-v21/values-ldltr-v21.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "112",
+                        "endOffsets": "163"
+                    }
+                }
+            ]
+        }
+    ]
+}
