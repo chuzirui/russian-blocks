@@ -45,6 +45,18 @@ enum class TetrominoShape(val color: Int, val blocks: Array<IntArray>) {
         intArrayOf(1, 1)
     )),
 
+    HOOK3(Color.rgb(180, 120, 255), arrayOf(
+        intArrayOf(0, 1, 0),
+        intArrayOf(0, 1, 0),
+        intArrayOf(1, 0, 0)
+    )),
+
+    HOOK3M(Color.rgb(120, 255, 180), arrayOf(
+        intArrayOf(1, 0, 0),
+        intArrayOf(1, 0, 0),
+        intArrayOf(0, 1, 0)
+    )),
+
     SLASH3(Color.rgb(255, 160, 100), arrayOf(
         intArrayOf(0, 0, 1),
         intArrayOf(0, 1, 0),
@@ -123,6 +135,18 @@ enum class TetrominoShape(val color: Int, val blocks: Array<IntArray>) {
         intArrayOf(0, 1, 0, 0),
         intArrayOf(0, 1, 0, 0),
         intArrayOf(1, 1, 0, 0)
+    )),
+
+    SEVEN5(Color.rgb(255, 90, 160), arrayOf(
+        intArrayOf(1, 1, 1),
+        intArrayOf(0, 0, 1),
+        intArrayOf(0, 0, 1)
+    )),
+
+    SEVEN5M(Color.rgb(90, 200, 130), arrayOf(
+        intArrayOf(1, 1, 1),
+        intArrayOf(1, 0, 0),
+        intArrayOf(1, 0, 0)
     )),
 
     T5(Color.rgb(255, 127, 80), arrayOf(
