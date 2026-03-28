@@ -12,7 +12,16 @@ class GameEngine(private val listener: GameListener) {
         fun onBoardUpdated()
         fun onBombCountChanged(bombs: Int)
         fun onHighScoreBroken(newHighScore: Int)
-        fun onBombCascadeTick()
+        fun onLineClear(lineCount: Int)
+        fun onBombExplosion()
+        fun onBombChainGravity()
+        fun onBombCascadeStart()
+
+        fun onPieceShifted()
+        fun onPieceRotated()
+        fun onSoftDropStep()
+        fun onHardDropImpact(rowsDropped: Int)
+        fun onPieceLockedNoClear()
     }
 
     val board = Board()
@@ -59,6 +68,7 @@ class GameEngine(private val listener: GameListener) {
         if (board.isValidPosition(p.blocks, p.x - 1, p.y)) {
             p.x--
             updateGhost()
+            listener.onPieceShifted()
             listener.onBoardUpdated()
         }
     }
@@ -69,6 +79,7 @@ class GameEngine(private val listener: GameListener) {
         if (board.isValidPosition(p.blocks, p.x + 1, p.y)) {
             p.x++
             updateGhost()
+            listener.onPieceShifted()
             listener.onBoardUpdated()
         }
     }
@@ -77,9 +88,9 @@ class GameEngine(private val listener: GameListener) {
         if (isGameOver || isPaused || bombAnimating) return
         val p = currentPiece ?: return
         val rotated = p.rotatedCW()
-        if (tryWallKick(p, rotated)) {
-            p.blocks = rotated
+        if (tryRotateKeepLeftEdge(p, rotated)) {
             updateGhost()
+            listener.onPieceRotated()
             listener.onBoardUpdated()
         }
     }
@@ -91,6 +102,7 @@ class GameEngine(private val listener: GameListener) {
             p.y++
             score += 1
             checkHighScore()
+            listener.onSoftDropStep()
             listener.onScoreChanged(score, level, totalLines)
             listener.onBoardUpdated()
         }
@@ -106,7 +118,7 @@ class GameEngine(private val listener: GameListener) {
         }
         score += rows * 2
         checkHighScore()
-        lockAndAdvance()
+        lockAndAdvance(fromHardDrop = true, hardDropRows = rows)
     }
 
     /**
@@ -125,34 +137,39 @@ class GameEngine(private val listener: GameListener) {
         listener.onBombCountChanged(bombs)
 
         board.removeColor(color)
+        listener.onBombExplosion()
         listener.onBoardUpdated()
         bombAnimating = true
+        listener.onBombCascadeStart()
+    }
 
-        bombCascadeStep()
+    /** Gravity phase of bomb chain (blocks fall). */
+    fun bombCascadeGravityPhase() {
+        board.applyGravity()
+        listener.onBoardUpdated()
+        listener.onBombChainGravity()
     }
 
     /**
-     * One step of the bomb cascade: gravity → clear → repeat.
-     * Called with a delay between steps so the player sees each stage.
+     * Line-clear phase after gravity. Returns true if lines were cleared
+     * (another gravity+clear cycle may follow).
      */
-    fun bombCascadeStep() {
-        board.applyGravity()
-        listener.onBoardUpdated()
-
+    fun bombCascadeClearPhase(): Boolean {
         val cleared = board.clearLines()
         if (cleared > 0) {
             totalLines += cleared
             score += lineScore(cleared) * level
             level = (totalLines / 10) + 1
             checkHighScore()
+            listener.onLineClear(cleared)
             listener.onScoreChanged(score, level, totalLines)
             listener.onBoardUpdated()
-            listener.onBombCascadeTick()
-        } else {
-            bombAnimating = false
-            checkHighScore()
-            listener.onScoreChanged(score, level, totalLines)
+            return true
         }
+        bombAnimating = false
+        checkHighScore()
+        listener.onScoreChanged(score, level, totalLines)
+        return false
     }
 
     /** Called by the game loop at each drop interval */
@@ -163,7 +180,7 @@ class GameEngine(private val listener: GameListener) {
             p.y++
             listener.onBoardUpdated()
         } else {
-            lockAndAdvance()
+            lockAndAdvance(fromHardDrop = false)
         }
     }
 
@@ -183,9 +200,11 @@ class GameEngine(private val listener: GameListener) {
         listener.onBoardUpdated()
     }
 
-    private fun lockAndAdvance() {
+    private fun lockAndAdvance(fromHardDrop: Boolean = false, hardDropRows: Int = 0) {
         val p = currentPiece ?: return
         board.lock(p)
+
+        if (fromHardDrop) listener.onHardDropImpact(hardDropRows)
 
         var totalCleared = 0
         var cleared = board.clearLines()
@@ -199,6 +218,9 @@ class GameEngine(private val listener: GameListener) {
             totalLines += totalCleared
             score += lineScore(totalCleared) * level
             level = (totalLines / 10) + 1
+            listener.onLineClear(totalCleared)
+        } else if (!fromHardDrop) {
+            listener.onPieceLockedNoClear()
         }
         checkHighScore()
         listener.onScoreChanged(score, level, totalLines)
@@ -231,16 +253,32 @@ class GameEngine(private val listener: GameListener) {
         ghostY = gy
     }
 
-    private fun tryWallKick(piece: Tetromino, rotated: Array<IntArray>): Boolean {
-        for (dx in intArrayOf(0, -1, 1, -2, 2)) {
-            for (dy in intArrayOf(0, -1, 1)) {
-                if (board.isValidPosition(rotated, piece.x + dx, piece.y + dy)) {
-                    piece.x += dx
-                    piece.y += dy
-                    return true
-                }
+    /**
+     * Keeps the board column of the leftmost filled cell fixed; only vertical
+     * nudges are tried if the anchored position collides (no horizontal slide).
+     */
+    private fun tryRotateKeepLeftEdge(piece: Tetromino, rotated: Array<IntArray>): Boolean {
+        val leftBoardCol = piece.x + leftmostFilledCol(piece.blocks)
+        val minColRot = leftmostFilledCol(rotated)
+        val newX = leftBoardCol - minColRot
+        for (dy in intArrayOf(0, -1, 1, -2, 2)) {
+            if (board.isValidPosition(rotated, newX, piece.y + dy)) {
+                piece.x = newX
+                piece.y += dy
+                piece.blocks = rotated
+                return true
             }
         }
         return false
+    }
+
+    private fun leftmostFilledCol(blocks: Array<IntArray>): Int {
+        var minC = Int.MAX_VALUE
+        for (r in blocks.indices) {
+            for (c in blocks[r].indices) {
+                if (blocks[r][c] != 0) minC = minOf(minC, c)
+            }
+        }
+        return if (minC == Int.MAX_VALUE) 0 else minC
     }
 }

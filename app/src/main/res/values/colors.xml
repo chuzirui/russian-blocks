@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
+    <!-- Legacy Material bridge -->
+    <color name="purple_500">#FF2563EB</color>
+    <color name="purple_700">#FF1D4ED8</color>
+    <color name="teal_200">#FF3B82F6</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background_dark">#FF0F0F19</color>
+    <color name="background_dark">#FF0F172A</color>
+
+    <!-- Russian Blocks design system -->
+    <color name="ds_primary">#FF2563EB</color>
+    <color name="ds_secondary">#FF3B82F6</color>
+    <color name="ds_cta">#FFF97316</color>
+    <color name="ds_background">#FFF8FAFC</color>
+    <color name="ds_text">#FF1E293B</color>
+    <color name="ds_text_muted">#FF64748B</color>
+    <color name="ds_surface_dark">#E61E293B</color>
+    <color name="ds_dialog_bg">#FF1E293B</color>
+    <color name="ds_control_idle">#FF334155</color>
+    <color name="ds_control_icon">#FFCBD5E1</color>
+    <color name="ds_bomb_active">#FFEA580C</color>
+
+    <!-- Button polish: strokes and ripples -->
+    <color name="ds_control_stroke">#66475569</color>
+    <color name="ds_secondary_stroke">#803B82F6</color>
+    <color name="ds_cta_stroke">#80FB923C</color>
+    <color name="ds_primary_stroke">#8060A5FA</color>
+    <color name="ds_ripple_on_dark">#40FFFFFF</color>
+    <color name="ds_ripple_cta">#4DF97316</color>
+    <!-- ui-ux-pro-max: theater / premium dark + spotlight gold (outlines) -->
+    <color name="ds_accent_gold">#FFCA8A04</color>
+    <color name="ds_ripple_gold">#40CA8A04</color>
 </resources>

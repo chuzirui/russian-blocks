@@ -1,3 +1,7 @@
+# Suppress R8 warnings
+-dontwarn android.media.LoudnessCodecController$OnLoudnessCodecUpdateListener
+-dontwarn android.media.LoudnessCodecController
+
 # Keep game classes
 -keep class com.russianblocks.game.** { *; }
 

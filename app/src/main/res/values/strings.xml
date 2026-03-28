@@ -3,8 +3,6 @@
     <string name="app_name">Russian Blocks</string>
     <string name="subtitle">Classic block puzzle</string>
     <string name="play">PLAY</string>
-    <string name="pause">PAUSE</string>
-    <string name="resume">RESUME</string>
     <string name="game_over">Game Over</string>
     <string name="final_score">Score: %d</string>
     <string name="final_score_best">Score: %d\n\nNew High Score!</string>
@@ -12,4 +10,16 @@
     <string name="play_again">Play Again</string>
     <string name="quit">Quit</string>
     <string name="controls_hint">Use the buttons below to play\nor swipe on the board</string>
+    <string name="bomb_shop">Bomb shop</string>
+    <string name="bomb_label">Bomb</string>
+    <string name="bomb_count_fmt">Bomb × %d</string>
+    <string name="buy_bombs">Buy bombs</string>
+    <string name="desc_move_left">Move left</string>
+    <string name="desc_move_right">Move right</string>
+    <string name="desc_soft_drop">Soft drop</string>
+    <string name="desc_rotate">Rotate</string>
+    <string name="desc_hard_drop">Hard drop</string>
+    <string name="desc_bomb">Bomb</string>
+    <string name="desc_play">Start game</string>
+    <string name="desc_bomb_shop">Open bomb shop</string>
 </resources>

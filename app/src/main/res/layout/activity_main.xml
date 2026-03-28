@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF0F0F19">
+    android:background="@color/background_dark">
 
     <LinearLayout
         android:id="@+id/gameContainer"
@@ -11,15 +11,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Banner ad at top -->
         <com.google.android.gms.ads.AdView
             android:id="@+id/adBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:background="#FF0A0A14"
-            ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+            android:background="@color/ds_surface_dark"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-3940256099942544/6300978111"
             android:visibility="gone" />
 
         <com.russianblocks.game.GameView
@@ -28,112 +27,168 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Control buttons -->
         <LinearLayout
             android:id="@+id/controlsBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#FF0A0A14"
+            android:background="@drawable/glass_controls_bar"
             android:paddingHorizontal="12dp"
-            android:paddingTop="6dp"
+            android:paddingTop="8dp"
             android:paddingBottom="12dp"
             android:visibility="gone">
 
-            <!-- Row 1: Left / Rotate / Right -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <Button
-                    android:id="@+id/btnLeft"
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:backgroundTint="#FF2A2A40"
-                    android:text="◀"
-                    android:textColor="#DDDDDD"
-                    android:textSize="22sp" />
+                    android:layout_marginEnd="8dp">
 
-                <Button
-                    android:id="@+id/btnRotate"
-                    android:layout_width="0dp"
-                    android:layout_height="58dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="4dp"
-                    android:backgroundTint="#FF3A2A60"
-                    android:text="↻"
-                    android:textColor="#DDDDDD"
-                    android:textSize="22sp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLeft"
+                        style="@style/Widget.RussianBlocks.Button.Control"
+                        android:layout_width="wrap_content"
+                        android:layout_height="58dp"
+                        android:layout_gravity="center_horizontal"
+                        android:minWidth="56dp"
+                        android:paddingHorizontal="14dp"
+                        android:contentDescription="@string/desc_move_left"
+                        android:text=""
+                        app:icon="@drawable/ic_control_chevron_left"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/ds_control_icon" />
+                </FrameLayout>
 
-                <Button
-                    android:id="@+id/btnRight"
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:backgroundTint="#FF2A2A40"
-                    android:text="▶"
-                    android:textColor="#DDDDDD"
-                    android:textSize="22sp" />
+                    android:layout_marginEnd="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRotate"
+                        style="@style/Widget.RussianBlocks.Button.ControlAccent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="58dp"
+                        android:layout_gravity="center_horizontal"
+                        android:minWidth="56dp"
+                        android:paddingHorizontal="14dp"
+                        android:contentDescription="@string/desc_rotate"
+                        android:text=""
+                        app:icon="@drawable/ic_control_rotate_cw"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/white" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRight"
+                        style="@style/Widget.RussianBlocks.Button.Control"
+                        android:layout_width="wrap_content"
+                        android:layout_height="58dp"
+                        android:layout_gravity="center_horizontal"
+                        android:minWidth="56dp"
+                        android:paddingHorizontal="14dp"
+                        android:contentDescription="@string/desc_move_right"
+                        android:text=""
+                        app:icon="@drawable/ic_control_chevron_right"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/ds_control_icon" />
+                </FrameLayout>
 
             </LinearLayout>
 
-            <!-- Row 2: Down / Drop / Pause -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <Button
-                    android:id="@+id/btnDown"
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:backgroundTint="#FF2A2A40"
-                    android:text="▼"
-                    android:textColor="#DDDDDD"
-                    android:textSize="22sp" />
+                    android:layout_marginEnd="8dp">
 
-                <Button
-                    android:id="@+id/btnDrop"
-                    android:layout_width="0dp"
-                    android:layout_height="58dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="4dp"
-                    android:backgroundTint="#FF6200EE"
-                    android:text="⏬"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDown"
+                        style="@style/Widget.RussianBlocks.Button.Control"
+                        android:layout_width="wrap_content"
+                        android:layout_height="58dp"
+                        android:layout_gravity="center_horizontal"
+                        android:minWidth="56dp"
+                        android:paddingHorizontal="14dp"
+                        android:contentDescription="@string/desc_soft_drop"
+                        android:text=""
+                        app:icon="@drawable/ic_control_chevron_down"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/ds_control_icon" />
+                </FrameLayout>
 
-                <Button
-                    android:id="@+id/btnBomb"
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="58dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="4dp"
-                    android:backgroundTint="#FF331111"
-                    android:text="💣"
-                    android:textColor="#666666"
-                    android:textSize="20sp"
-                    android:enabled="false" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_marginEnd="8dp">
 
-                <Button
-                    android:id="@+id/btnPause"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDrop"
+                        style="@style/Widget.RussianBlocks.Button.Cta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="72dp"
+                        android:layout_gravity="center_horizontal"
+                        android:minWidth="88dp"
+                        android:paddingHorizontal="20dp"
+                        android:contentDescription="@string/desc_hard_drop"
+                        android:text=""
+                        app:icon="@drawable/ic_control_hard_drop"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="32dp"
+                        app:iconTint="@color/white" />
+                </FrameLayout>
+
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="58dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:backgroundTint="#FF1A1A30"
-                    android:text="@string/pause"
-                    android:textColor="#999999"
-                    android:textSize="13sp" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBomb"
+                        style="@style/Widget.RussianBlocks.Button.Control"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:contentDescription="@string/desc_bomb"
+                        android:gravity="center"
+                        android:text="@string/bomb_label"
+                        android:textColor="@color/btn_bomb_content"
+                        android:textSize="13sp"
+                        android:enabled="false"
+                        app:icon="@drawable/ic_control_bomb"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="20dp"
+                        app:iconTint="@color/btn_bomb_content" />
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -141,7 +196,6 @@
 
     </LinearLayout>
 
-    <!-- Start screen overlay -->
     <FrameLayout
         android:id="@+id/startOverlay"
         android:layout_width="match_parent"
@@ -153,68 +207,81 @@
             android:scaleType="centerCrop"
             android:src="@drawable/splash_bg" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#590F172A" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#88000010"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="32dp">
+            android:padding="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-black"
-                android:text="@string/app_name"
-                android:textColor="#FFFFFF"
-                android:textSize="42sp"
-                android:textStyle="bold"
-                android:shadowColor="#AA000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="6" />
+                android:layout_gravity="center_horizontal"
+                android:maxWidth="360dp"
+                android:background="@drawable/glass_surface"
+                android:elevation="8dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="28dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="28dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/subtitle"
-                android:textColor="#CCCCEE"
-                android:textSize="16sp"
-                android:shadowColor="#AA000000"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="4" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:letterSpacing="0.02"
+                    android:text="@string/app_name"
+                    android:textColor="@color/ds_text"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnStart"
-                android:layout_width="220dp"
-                android:layout_height="56dp"
-                android:layout_marginTop="48dp"
-                android:backgroundTint="#FF6200EE"
-                android:text="@string/play"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="@string/subtitle"
+                    android:textColor="@color/ds_text_muted"
+                    android:textSize="15sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:gravity="center"
-                android:text="@string/controls_hint"
-                android:textColor="#99AABB"
-                android:textSize="13sp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStart"
+                    style="@style/Widget.RussianBlocks.Button.Primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="28dp"
+                    android:contentDescription="@string/desc_play"
+                    android:text="@string/play" />
 
-            <Button
-                android:id="@+id/btnShop"
-                android:layout_width="160dp"
-                android:layout_height="42dp"
-                android:layout_marginTop="40dp"
-                android:backgroundTint="#AA2A2A40"
-                android:text="🛒 Bomb Shop"
-                android:textColor="#AAAACC"
-                android:textSize="14sp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/controls_hint"
+                    android:textColor="@color/ds_text_muted"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnShop"
+                    style="@style/Widget.RussianBlocks.Button.Shop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="20dp"
+                    android:minWidth="168dp"
+                    android:contentDescription="@string/desc_bomb_shop"
+                    android:text="@string/bomb_shop" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

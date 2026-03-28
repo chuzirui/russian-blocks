@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextAppearance.RussianBlocks.Title" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Game control bar: compact icon buttons with stroke + ripple -->
+    <style name="Widget.RussianBlocks.Button.Control" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textColor">@color/ds_control_icon</item>
+        <item name="backgroundTint">@color/ds_control_idle</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/ds_control_stroke</item>
+        <item name="rippleColor">@color/ds_ripple_on_dark</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+    </style>
+
+    <style name="Widget.RussianBlocks.Button.ControlAccent" parent="Widget.RussianBlocks.Button.Control">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/ds_secondary</item>
+        <item name="strokeColor">@color/ds_secondary_stroke</item>
+    </style>
+
+    <style name="Widget.RussianBlocks.Button.Cta" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="cornerRadius">18dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/ds_cta</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/ds_cta_stroke</item>
+        <item name="rippleColor">@color/ds_ripple_on_dark</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+    </style>
+
+    <!-- Start screen -->
+    <style name="Widget.RussianBlocks.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/ds_primary</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/ds_primary_stroke</item>
+        <item name="rippleColor">@color/ds_ripple_on_dark</item>
+        <item name="android:elevation">3dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.RussianBlocks.Button.Shop" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/ds_accent_gold</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="strokeColor">@color/ds_accent_gold</item>
+        <item name="rippleColor">@color/ds_ripple_gold</item>
+    </style>
+
+</resources>

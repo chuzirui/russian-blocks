@@ -11,6 +11,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 
 class GameView @JvmOverloads constructor(
     context: Context,
@@ -22,25 +23,26 @@ class GameView @JvmOverloads constructor(
 
     private val cellPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(30, 30, 42)
+        color = Color.rgb(72, 78, 118)
         style = Paint.Style.STROKE
-        strokeWidth = 1f
+        strokeWidth = 1.5f
     }
     private val ghostFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val ghostStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 2f
+        strokeWidth = 3f
     }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         textSize = 40f
-        typeface = Typeface.DEFAULT_BOLD
+        typeface = ResourcesCompat.getFont(context, R.font.plus_jakarta_sans)
+            ?: Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
     }
     private val panelPaint = Paint().apply { color = Color.rgb(24, 24, 38) }
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(60, 60, 100)
+        color = Color.rgb(100, 108, 160)
         style = Paint.Style.STROKE
-        strokeWidth = 2f
+        strokeWidth = 2.5f
     }
 
     private var cellSize = 0f
@@ -52,6 +54,12 @@ class GameView @JvmOverloads constructor(
     var gameOverCallback: ((finalScore: Int) -> Unit)? = null
     var bombCountCallback: ((bombs: Int) -> Unit)? = null
     var highScoreBrokenCallback: ((newHighScore: Int) -> Unit)? = null
+    var soundManager: GameSoundManager? = null
+
+    private companion object {
+        private const val BOMB_MS_GRAVITY_TO_CLEAR = 580L
+        private const val BOMB_MS_AFTER_CLEAR_NEXT = 680L
+    }
 
     private val tickRunnable = object : Runnable {
         override fun run() {
@@ -164,6 +172,11 @@ class GameView @JvmOverloads constructor(
         sideWidth = w - boardLeft - boardW - padding * 2
 
         textPaint.textSize = (cellSize * 0.55f).coerceAtLeast(24f)
+
+        ghostStrokePaint.strokeWidth = (cellSize * 0.08f).coerceIn(2.5f, 5f)
+
+        gridPaint.strokeWidth = (cellSize * 0.035f).coerceIn(1.5f, 3f)
+        borderPaint.strokeWidth = (cellSize * 0.05f).coerceIn(2f, 4f)
     }
 
     /* ── Drawing ────────────────────────────────────────── */
@@ -216,14 +229,19 @@ class GameView @JvmOverloads constructor(
         val piece = engine.currentPiece ?: return
         if (engine.ghostY == piece.y) return
         val baseColor = piece.shape.color
-        ghostFillPaint.color = baseColor and 0x00FFFFFF or 0x18000000
-        ghostStrokePaint.color = baseColor and 0x00FFFFFF or 0x66000000
-        for (r in piece.blocks.indices) {
-            for (c in piece.blocks[r].indices) {
-                if (piece.blocks[r][c] == 0) continue
-                val x = boardLeft + (piece.x + c) * cellSize
-                val y = boardTop + (engine.ghostY + r) * cellSize
-                val inset = cellSize * 0.1f
+        val r = Color.red(baseColor)
+        val g = Color.green(baseColor)
+        val b = Color.blue(baseColor)
+        /* Filled silhouette — ~38% alpha so it reads on dark grid */
+        ghostFillPaint.color = Color.argb(98, r, g, b)
+        /* Bright outline: light rim + piece tint so shape reads at a glance */
+        ghostStrokePaint.color = Color.argb(245, 255, 255, 255)
+        val inset = cellSize * 0.08f
+        for (row in piece.blocks.indices) {
+            for (col in piece.blocks[row].indices) {
+                if (piece.blocks[row][col] == 0) continue
+                val x = boardLeft + (piece.x + col) * cellSize
+                val y = boardTop + (engine.ghostY + row) * cellSize
                 canvas.drawRect(x + inset, y + inset, x + cellSize - inset, y + cellSize - inset, ghostFillPaint)
                 canvas.drawRect(x + inset, y + inset, x + cellSize - inset, y + cellSize - inset, ghostStrokePaint)
             }
@@ -384,7 +402,52 @@ class GameView @JvmOverloads constructor(
         postInvalidate()
     }
 
-    override fun onBombCascadeTick() {
-        handler.postDelayed({ engine.bombCascadeStep() }, 300)
+    override fun onLineClear(lineCount: Int) {
+        soundManager?.playLineClear(lineCount)
+        postInvalidate()
+    }
+
+    override fun onBombExplosion() {
+        soundManager?.playBombExplosion()
+        postInvalidate()
+    }
+
+    override fun onBombChainGravity() {
+        soundManager?.playChainGravity()
+        postInvalidate()
+    }
+
+    override fun onPieceShifted() {
+        soundManager?.playMove()
+    }
+
+    override fun onPieceRotated() {
+        soundManager?.playRotate()
+    }
+
+    override fun onSoftDropStep() {
+        soundManager?.playSoftDrop()
+    }
+
+    override fun onHardDropImpact(rowsDropped: Int) {
+        soundManager?.playHardDrop(rowsDropped)
+    }
+
+    override fun onPieceLockedNoClear() {
+        soundManager?.playLock()
+    }
+
+    override fun onBombCascadeStart() {
+        runBombCascadeStep()
+    }
+
+    private fun runBombCascadeStep() {
+        engine.bombCascadeGravityPhase()
+        handler.postDelayed({
+            val needContinue = engine.bombCascadeClearPhase()
+            if (needContinue) {
+                handler.postDelayed({ runBombCascadeStep() }, BOMB_MS_AFTER_CLEAR_NEXT)
+            }
+        }, BOMB_MS_GRAVITY_TO_CLEAR)
     }
 }

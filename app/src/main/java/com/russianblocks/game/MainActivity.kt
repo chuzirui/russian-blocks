@@ -2,10 +2,12 @@ package com.russianblocks.game
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
@@ -14,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -38,13 +41,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startOverlay: FrameLayout
     private lateinit var controlsBar: LinearLayout
     private lateinit var btnStart: Button
-    private lateinit var btnPause: Button
     private lateinit var btnBomb: Button
     private lateinit var adBanner: AdView
 
     private var interstitialAd: InterstitialAd? = null
     private var gamesPlayed = 0
     private lateinit var billingManager: BillingManager
+    private lateinit var soundManager: GameSoundManager
 
     private val repeatHandler = Handler(Looper.getMainLooper())
     private val repeatDelay = 120L
@@ -61,11 +64,13 @@ class MainActivity : AppCompatActivity() {
         startOverlay = findViewById(R.id.startOverlay)
         controlsBar = findViewById(R.id.controlsBar)
         btnStart = findViewById(R.id.btnStart)
-        btnPause = findViewById(R.id.btnPause)
         btnBomb = findViewById(R.id.btnBomb)
         adBanner = findViewById(R.id.adBanner)
 
         gameView.highScore = loadHighScore()
+
+        soundManager = GameSoundManager(this)
+        gameView.soundManager = soundManager
 
         billingManager = BillingManager(this) { amount ->
             addBombs(amount)
@@ -75,11 +80,13 @@ class MainActivity : AppCompatActivity() {
 
         initAds()
 
-        findViewById<Button>(R.id.btnShop).setOnClickListener {
+        findViewById<Button>(R.id.btnShop).setOnClickListener { v ->
+            tapHaptic(v)
             showShopDialog()
         }
 
-        btnStart.setOnClickListener {
+        btnStart.setOnClickListener { v ->
+            tapHaptic(v)
             startOverlay.visibility = View.GONE
             controlsBar.visibility = View.VISIBLE
             adBanner.visibility = View.VISIBLE
@@ -88,18 +95,9 @@ class MainActivity : AppCompatActivity() {
             loadBombsIntoEngine()
         }
 
-        btnPause.setOnClickListener {
-            if (gameView.isPaused) {
-                gameView.resumeGame()
-                btnPause.text = getString(R.string.pause)
-            } else {
-                gameView.pauseGame()
-                btnPause.text = getString(R.string.resume)
-            }
-        }
-
-        btnBomb.setOnClickListener {
+        btnBomb.setOnClickListener { v ->
             if (gameView.bombs > 0) {
+                tapHaptic(v)
                 gameView.useBomb()
             }
         }
@@ -108,8 +106,14 @@ class MainActivity : AppCompatActivity() {
         setupRepeatingButton(R.id.btnRight) { gameView.moveRight() }
         setupRepeatingButton(R.id.btnDown)  { gameView.softDrop() }
 
-        findViewById<Button>(R.id.btnRotate).setOnClickListener { gameView.rotateCW() }
-        findViewById<Button>(R.id.btnDrop).setOnClickListener   { gameView.hardDrop() }
+        findViewById<Button>(R.id.btnRotate).setOnClickListener { v ->
+            tapHaptic(v)
+            gameView.rotateCW()
+        }
+        findViewById<Button>(R.id.btnDrop).setOnClickListener { v ->
+            tapHaptic(v)
+            gameView.hardDrop()
+        }
 
         gameView.bombCountCallback = { bombs ->
             runOnUiThread {
@@ -181,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         val items = products.map { "${it.title}  —  ${it.price}" }.toTypedArray()
 
         AlertDialog.Builder(this, R.style.GameOverDialog)
-            .setTitle("\uD83D\uDCA3 Bomb Shop")
+            .setTitle(R.string.bomb_shop)
             .setItems(items) { _, which ->
                 billingManager.launchPurchase(products[which].id)
                 onClose?.invoke()
@@ -198,13 +202,15 @@ class MainActivity : AppCompatActivity() {
     private fun updateBombButton(bombs: Int) {
         btnBomb.isEnabled = bombs > 0
         if (bombs > 0) {
-            btnBomb.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFCC2222.toInt())
-            btnBomb.text = "\uD83D\uDCA3 $bombs"
-            btnBomb.setTextColor(0xFFFFFFFF.toInt())
+            btnBomb.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.ds_bomb_active)
+            )
+            btnBomb.text = getString(R.string.bomb_count_fmt, bombs)
         } else {
-            btnBomb.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF331111.toInt())
-            btnBomb.text = "\uD83D\uDCA3"
-            btnBomb.setTextColor(0xFF666666.toInt())
+            btnBomb.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.ds_control_idle)
+            )
+            btnBomb.text = getString(R.string.bomb_label)
         }
     }
 
@@ -271,9 +277,8 @@ class MainActivity : AppCompatActivity() {
                 gameView.highScore = loadHighScore()
                 gameView.startGame()
                 loadBombsIntoEngine()
-                btnPause.text = getString(R.string.pause)
             }
-            .setNeutralButton("\uD83D\uDCA3 Buy Bombs") { _, _ ->
+            .setNeutralButton(R.string.buy_bombs) { _, _ ->
                 showShopDialog { showGameOverDialog(finalScore) }
             }
             .setNegativeButton(getString(R.string.quit)) { _, _ ->
@@ -298,9 +303,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        button.setOnTouchListener { _, event ->
+        button.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    tapHaptic(v)
                     repeating = true
                     action()
                     repeatHandler.postDelayed(repeatRunnable, repeatDelay * 2)
@@ -323,19 +329,27 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         if (!gameView.isGameOver) {
             gameView.pauseGame()
-            btnPause.text = getString(R.string.resume)
         }
     }
 
     override fun onResume() {
         super.onResume()
         adBanner.resume()
+        if (!gameView.isGameOver) {
+            gameView.resumeGame()
+        }
     }
 
     override fun onDestroy() {
+        gameView.soundManager = null
+        soundManager.release()
         adBanner.destroy()
         billingManager.destroy()
         super.onDestroy()
+    }
+
+    private fun tapHaptic(v: View) {
+        v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
     }
 
     private fun hideSystemUI() {

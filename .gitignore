@@ -16,3 +16,11 @@ captures/
 *.log
 *.hprof
 core.*
+*.jks
+*.keystore
+
+# Nested skill repo clone (accidental); do not commit
+ui-ux-pro-max-skill/
+
+**/__pycache__/
+*.pyc
