@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light theme: soft day sky + sun (layer-list) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="#E0F2FE"
+                android:endColor="#F8FAFC"
+                android:startColor="#BAE6FD"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item
+        android:gravity="bottom"
+        android:height="180dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:centerColor="#00E0F2FE"
+                android:endColor="#40CBD5E1"
+                android:startColor="#00000000"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item
+        android:width="88dp"
+        android:height="88dp"
+        android:gravity="top|end"
+        android:right="4dp"
+        android:top="28dp">
+        <shape android:shape="oval">
+            <solid android:color="#33FDE68A" />
+        </shape>
+    </item>
+    <item
+        android:width="56dp"
+        android:height="56dp"
+        android:gravity="top|end"
+        android:right="20dp"
+        android:top="44dp">
+        <shape android:shape="oval">
+            <solid android:color="#CCFDE047" />
+        </shape>
+    </item>
+</layer-list>

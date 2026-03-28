@@ -6,12 +6,12 @@
         <item name="colorAccent">@color/ds_cta</item>
         <item name="android:fontFamily">@font/plus_jakarta_sans</item>
         <item name="fontFamily">@font/plus_jakarta_sans</item>
-        <item name="android:windowBackground">@color/background_dark</item>
-        <item name="android:statusBarColor">@color/background_dark</item>
-        <item name="android:navigationBarColor">@color/background_dark</item>
+        <item name="android:windowBackground">@color/background_app</item>
+        <item name="android:statusBarColor">@color/background_app</item>
+        <item name="android:navigationBarColor">@color/background_app</item>
     </style>
 
-    <style name="GameOverDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+    <style name="GameOverDialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="colorAccent">@color/ds_primary</item>
         <item name="android:textColorPrimary">@color/ds_control_icon</item>
         <item name="android:background">@color/ds_dialog_bg</item>

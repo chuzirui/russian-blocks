@@ -9,8 +9,12 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View.MeasureSpec
 import android.view.View
+import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 
 class GameView @JvmOverloads constructor(
@@ -23,7 +27,6 @@ class GameView @JvmOverloads constructor(
 
     private val cellPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(72, 78, 118)
         style = Paint.Style.STROKE
         strokeWidth = 1.5f
     }
@@ -38,17 +41,35 @@ class GameView @JvmOverloads constructor(
         typeface = ResourcesCompat.getFont(context, R.font.plus_jakarta_sans)
             ?: Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
     }
-    private val panelPaint = Paint().apply { color = Color.rgb(24, 24, 38) }
+    private val panelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(100, 108, 160)
         style = Paint.Style.STROKE
         strokeWidth = 2.5f
     }
+
+    private var colorGameCanvas = 0
+    private var colorBoardBg = 0
+    private var colorGameGrid = 0
+    private var colorBoardFrame = 0
+    private var colorHudPanel = 0
+    private var colorHudStroke = 0
+    private var colorHudLabel = 0
+    private var colorHudValue = 0
+    private var colorHudMuted = 0
+    private var colorHudGold = 0
+    private var colorGhostOutline = 0
 
     private var cellSize = 0f
     private var boardLeft = 0f
     private var boardTop = 0f
     private var sideWidth = 0f
+
+    init {
+        resolveGameColors()
+    }
+
+    /** Called after [onSizeChanged] so the host can align overlays (e.g. bomb) with the HUD column. */
+    var bombLayoutListener: (() -> Unit)? = null
 
     var scoreCallback: ((score: Int, level: Int, lines: Int) -> Unit)? = null
     var gameOverCallback: ((finalScore: Int) -> Unit)? = null
@@ -138,6 +159,27 @@ class GameView @JvmOverloads constructor(
     val isGameOver get() = engine.isGameOver
     val isPaused get() = engine.isPaused
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        resolveGameColors()
+    }
+
+    private fun resolveGameColors() {
+        colorGameCanvas = ContextCompat.getColor(context, R.color.ds_game_canvas)
+        colorBoardBg = ContextCompat.getColor(context, R.color.ds_game_board_bg)
+        colorGameGrid = ContextCompat.getColor(context, R.color.ds_game_grid)
+        colorBoardFrame = ContextCompat.getColor(context, R.color.ds_game_board_frame)
+        colorHudPanel = ContextCompat.getColor(context, R.color.ds_hud_panel)
+        colorHudStroke = ContextCompat.getColor(context, R.color.ds_hud_stroke)
+        colorHudLabel = ContextCompat.getColor(context, R.color.ds_hud_label)
+        colorHudValue = ContextCompat.getColor(context, R.color.ds_hud_value)
+        colorHudMuted = ContextCompat.getColor(context, R.color.ds_hud_muted)
+        colorHudGold = ContextCompat.getColor(context, R.color.ds_hud_gold)
+        colorGhostOutline = ContextCompat.getColor(context, R.color.ds_ghost_outline)
+        gridPaint.color = colorGameGrid
+        panelPaint.color = colorHudPanel
+    }
+
     fun moveLeft()  = engine.moveLeft()
     fun moveRight() = engine.moveRight()
     fun rotateCW()  = engine.rotateCW()
@@ -177,13 +219,42 @@ class GameView @JvmOverloads constructor(
 
         gridPaint.strokeWidth = (cellSize * 0.035f).coerceIn(1.5f, 3f)
         borderPaint.strokeWidth = (cellSize * 0.05f).coerceIn(2f, 4f)
+
+        bombLayoutListener?.invoke()
+    }
+
+    /**
+     * Places [button] in the HUD column: same width as the NEXT / SCORE rounded rects, bottom aligned with the playfield.
+     */
+    fun layoutBombButton(button: View) {
+        if (width <= 0 || height <= 0 || cellSize <= 0f) return
+        val boardW = cellSize * engine.board.width
+        val boardH = cellSize * engine.board.height
+        val panelLeft = boardLeft + boardW + 16f
+        val panelW = sideWidth.toInt().coerceAtLeast(1)
+        val boardBottom = boardTop + boardH
+
+        val lp = button.layoutParams as? FrameLayout.LayoutParams ?: return
+        lp.leftMargin = panelLeft.toInt()
+        lp.width = panelW
+        lp.height = FrameLayout.LayoutParams.WRAP_CONTENT
+        lp.gravity = Gravity.TOP or Gravity.START
+
+        button.measure(
+            MeasureSpec.makeMeasureSpec(panelW, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        )
+        val bombH = button.measuredHeight
+        lp.topMargin = (boardBottom - bombH).toInt().coerceAtLeast(0)
+
+        button.layoutParams = lp
     }
 
     /* ── Drawing ────────────────────────────────────────── */
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawColor(Color.rgb(15, 15, 25))
+        canvas.drawColor(colorGameCanvas)
 
         drawBoard(canvas)
         drawGhost(canvas)
@@ -195,7 +266,7 @@ class GameView @JvmOverloads constructor(
         val boardW = cellSize * engine.board.width
         val boardH = cellSize * engine.board.height
 
-        cellPaint.color = Color.rgb(16, 16, 26)
+        cellPaint.color = colorBoardBg
         canvas.drawRect(boardLeft, boardTop, boardLeft + boardW, boardTop + boardH, cellPaint)
 
         for (r in 0 until engine.board.height) {
@@ -210,6 +281,7 @@ class GameView @JvmOverloads constructor(
             }
         }
 
+        borderPaint.color = colorBoardFrame
         canvas.drawRect(boardLeft, boardTop, boardLeft + boardW, boardTop + boardH, borderPaint)
     }
 
@@ -232,10 +304,9 @@ class GameView @JvmOverloads constructor(
         val r = Color.red(baseColor)
         val g = Color.green(baseColor)
         val b = Color.blue(baseColor)
-        /* Filled silhouette — ~38% alpha so it reads on dark grid */
+        /* Filled silhouette — ~38% alpha */
         ghostFillPaint.color = Color.argb(98, r, g, b)
-        /* Bright outline: light rim + piece tint so shape reads at a glance */
-        ghostStrokePaint.color = Color.argb(245, 255, 255, 255)
+        ghostStrokePaint.color = colorGhostOutline
         val inset = cellSize * 0.08f
         for (row in piece.blocks.indices) {
             for (col in piece.blocks[row].indices) {
@@ -291,20 +362,22 @@ class GameView @JvmOverloads constructor(
         val panelLeft = boardLeft + boardW + 16f
         val panelTop = boardTop
         val previewSize = cellSize * 6
+        val corner = (cellSize * 0.22f).coerceIn(10f, 16f)
 
         canvas.drawRoundRect(
             panelLeft, panelTop, panelLeft + sideWidth, panelTop + previewSize,
-            12f, 12f, panelPaint
+            corner, corner, panelPaint
         )
+        borderPaint.color = colorHudStroke
         canvas.drawRoundRect(
             panelLeft, panelTop, panelLeft + sideWidth, panelTop + previewSize,
-            12f, 12f, borderPaint
+            corner, corner, borderPaint
         )
 
         textPaint.textAlign = Paint.Align.CENTER
         val cx = panelLeft + sideWidth / 2
 
-        textPaint.color = Color.rgb(180, 180, 200)
+        textPaint.color = colorHudMuted
         canvas.drawText("NEXT", cx, panelTop + cellSize * 0.8f, textPaint)
 
         val nextBlocks = engine.nextShape.blocks
@@ -326,53 +399,48 @@ class GameView @JvmOverloads constructor(
         }
 
         val statsTop = panelTop + previewSize + 24f
-        val statsH = cellSize * 9.5f
+        val statsH = cellSize * 7.4f
         canvas.drawRoundRect(
             panelLeft, statsTop, panelLeft + sideWidth, statsTop + statsH,
-            12f, 12f, panelPaint
+            corner, corner, panelPaint
         )
+        borderPaint.color = colorHudStroke
         canvas.drawRoundRect(
             panelLeft, statsTop, panelLeft + sideWidth, statsTop + statsH,
-            12f, 12f, borderPaint
+            corner, corner, borderPaint
         )
 
         val lineH = cellSize * 0.95f
         var ty = statsTop + lineH
 
-        textPaint.color = Color.rgb(120, 120, 160)
+        textPaint.color = colorHudLabel
         canvas.drawText("SCORE", cx, ty, textPaint)
         ty += lineH * 0.75f
-        textPaint.color = Color.WHITE
+        textPaint.color = colorHudValue
         canvas.drawText("${engine.score}", cx, ty, textPaint)
 
         ty += lineH
-        textPaint.color = Color.rgb(120, 120, 160)
+        textPaint.color = colorHudLabel
         canvas.drawText("BEST", cx, ty, textPaint)
         ty += lineH * 0.75f
         textPaint.color = if (engine.score > engine.highScore && engine.highScore > 0)
-            Color.rgb(255, 215, 0) else Color.rgb(180, 180, 200)
+            colorHudGold else colorHudMuted
         canvas.drawText("${maxOf(engine.highScore, engine.score)}", cx, ty, textPaint)
 
         ty += lineH
-        textPaint.color = Color.rgb(120, 120, 160)
+        textPaint.color = colorHudLabel
         canvas.drawText("LEVEL", cx, ty, textPaint)
         ty += lineH * 0.75f
-        textPaint.color = Color.WHITE
+        textPaint.color = colorHudValue
         canvas.drawText("${engine.level}", cx, ty, textPaint)
 
         ty += lineH
-        textPaint.color = Color.rgb(120, 120, 160)
+        textPaint.color = colorHudLabel
         canvas.drawText("LINES", cx, ty, textPaint)
         ty += lineH * 0.75f
-        textPaint.color = Color.WHITE
+        textPaint.color = colorHudValue
         canvas.drawText("${engine.totalLines}", cx, ty, textPaint)
 
-        ty += lineH
-        textPaint.color = Color.rgb(120, 120, 160)
-        canvas.drawText("BOMB", cx, ty, textPaint)
-        ty += lineH * 0.75f
-        textPaint.color = if (engine.bombs > 0) Color.rgb(255, 80, 80) else Color.rgb(60, 60, 80)
-        canvas.drawText("${engine.bombs}", cx, ty, textPaint)
     }
 
     /* ── Engine callbacks ───────────────────────────────── */

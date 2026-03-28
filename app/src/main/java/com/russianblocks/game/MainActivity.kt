@@ -3,6 +3,9 @@ package com.russianblocks.game
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,9 +21,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -39,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var gameView: GameView
     private lateinit var startOverlay: FrameLayout
+    private lateinit var startMenuContent: LinearLayout
     private lateinit var controlsBar: LinearLayout
     private lateinit var btnStart: Button
     private lateinit var btnBomb: Button
@@ -55,19 +61,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideSystemUI()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContentView(R.layout.activity_main)
+        setupEdgeToEdge()
 
         gameView = findViewById(R.id.gameView)
         startOverlay = findViewById(R.id.startOverlay)
+        startMenuContent = findViewById(R.id.startMenuContent)
         controlsBar = findViewById(R.id.controlsBar)
         btnStart = findViewById(R.id.btnStart)
         btnBomb = findViewById(R.id.btnBomb)
         adBanner = findViewById(R.id.adBanner)
 
         gameView.highScore = loadHighScore()
+        gameView.bombLayoutListener = { layoutBombButton() }
+        gameView.post { layoutBombButton() }
+
+        setupWindowInsets()
 
         soundManager = GameSoundManager(this)
         gameView.soundManager = soundManager
@@ -89,6 +100,8 @@ class MainActivity : AppCompatActivity() {
             tapHaptic(v)
             startOverlay.visibility = View.GONE
             controlsBar.visibility = View.VISIBLE
+            btnBomb.visibility = View.VISIBLE
+            layoutBombButton()
             adBanner.visibility = View.VISIBLE
             gameView.highScore = loadHighScore()
             gameView.startGame()
@@ -106,11 +119,11 @@ class MainActivity : AppCompatActivity() {
         setupRepeatingButton(R.id.btnRight) { gameView.moveRight() }
         setupRepeatingButton(R.id.btnDown)  { gameView.softDrop() }
 
-        findViewById<Button>(R.id.btnRotate).setOnClickListener { v ->
+        findViewById<View>(R.id.btnRotate).setOnClickListener { v ->
             tapHaptic(v)
             gameView.rotateCW()
         }
-        findViewById<Button>(R.id.btnDrop).setOnClickListener { v ->
+        findViewById<View>(R.id.btnDrop).setOnClickListener { v ->
             tapHaptic(v)
             gameView.hardDrop()
         }
@@ -199,6 +212,10 @@ class MainActivity : AppCompatActivity() {
 
     /* ── Bomb Button ────────────────────────────────────── */
 
+    private fun layoutBombButton() {
+        gameView.layoutBombButton(btnBomb)
+    }
+
     private fun updateBombButton(bombs: Int) {
         btnBomb.isEnabled = bombs > 0
         if (bombs > 0) {
@@ -283,6 +300,7 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.quit)) { _, _ ->
                 controlsBar.visibility = View.GONE
+                btnBomb.visibility = View.GONE
                 startOverlay.visibility = View.VISIBLE
             }
             .setCancelable(false)
@@ -293,7 +311,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupRepeatingButton(id: Int, action: () -> Unit) {
-        val button = findViewById<Button>(id)
+        val button = findViewById<View>(id)
         var repeating = false
         val repeatRunnable = object : Runnable {
             override fun run() {
@@ -352,12 +370,54 @@ class MainActivity : AppCompatActivity() {
         v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
     }
 
-    private fun hideSystemUI() {
+    private fun setupEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
         }
+        applyBarAppearance()
+    }
+
+    private fun applyBarAppearance() {
+        val night =
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !night
+            isAppearanceLightNavigationBars = !night
+        }
+    }
+
+    private fun setupWindowInsets() {
+        val baseMenuPad = resources.getDimensionPixelSize(R.dimen.start_menu_padding)
+        val controlsBarBottomPad = resources.getDimensionPixelSize(R.dimen.control_bar_padding_bottom)
+        val barInsets =
+            WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+
+        ViewCompat.setOnApplyWindowInsetsListener(startMenuContent) { v, insets ->
+            val s = insets.getInsets(barInsets)
+            v.setPadding(
+                s.left + baseMenuPad,
+                s.top + baseMenuPad,
+                s.right + baseMenuPad,
+                s.bottom + baseMenuPad
+            )
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(controlsBar) { v, insets ->
+            val nav = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = controlsBarBottomPad + nav.bottom)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(adBanner) { v, insets ->
+            val s = insets.getInsets(barInsets)
+            v.updatePadding(top = s.top)
+            insets
+        }
+        ViewCompat.requestApplyInsets(startMenuContent)
+        ViewCompat.requestApplyInsets(controlsBar)
+        ViewCompat.requestApplyInsets(adBanner)
     }
 }

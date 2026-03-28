@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme overrides (system dark / night) -->
+    <color name="background_app">#FF070B18</color>
+
+    <color name="ds_accent_blue">#FF60A5FA</color>
+    <color name="ds_surface_dark">#F2121828</color>
+    <color name="ds_dialog_bg">#FF0F1629</color>
+    <color name="ds_control_idle">#FF1A2E4D</color>
+    <color name="ds_control_icon">#FFE2E8F0</color>
+    <color name="ds_bomb_active">#FF60A5FA</color>
+
+    <color name="ds_control_stroke">#553B82F6</color>
+    <color name="ds_ripple">#33FFFFFF</color>
+
+    <color name="ds_glass_fill">#EBF1F5F9</color>
+    <color name="ds_glass_stroke">#4D3B82F6</color>
+    <color name="ds_bar_stroke">#402563EB</color>
+    <color name="ds_overlay_scrim">#66070B18</color>
+
+    <color name="ds_key_face">#FF152238</color>
+    <color name="ds_key_face_accent">#FF1E40AF</color>
+    <color name="ds_key_face_cta">#FF2563EB</color>
+    <color name="ds_key_stroke">#4793C5FD</color>
+
+    <color name="ds_game_canvas">#FF070B18</color>
+    <color name="ds_game_board_bg">#FF0C1526</color>
+    <color name="ds_game_grid">#40294A7A</color>
+    <color name="ds_game_board_frame">#CC2563EB</color>
+    <color name="ds_hud_panel">#E6121828</color>
+    <color name="ds_hud_stroke">#593B82F6</color>
+    <color name="ds_hud_label">#FF94A3B8</color>
+    <color name="ds_hud_value">#FFF1F5F9</color>
+    <color name="ds_hud_muted">#FFCBD5E1</color>
+    <color name="ds_hud_gold">#FFFBBF24</color>
+
+    <color name="ds_ghost_outline">#F5FFFFFF</color>
+</resources>

@@ -6,29 +6,53 @@
     <color name="teal_200">#FF3B82F6</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background_dark">#FF0F172A</color>
 
-    <!-- Russian Blocks design system -->
+    <!-- App shell (light / system light theme) -->
+    <color name="background_app">#FFF8FAFC</color>
+
     <color name="ds_primary">#FF2563EB</color>
     <color name="ds_secondary">#FF3B82F6</color>
-    <color name="ds_cta">#FFF97316</color>
+    <color name="ds_cta">#FF3B82F6</color>
+    <color name="ds_accent_blue">#FF2563EB</color>
     <color name="ds_background">#FFF8FAFC</color>
-    <color name="ds_text">#FF1E293B</color>
+    <color name="ds_text">#FF0F172A</color>
     <color name="ds_text_muted">#FF64748B</color>
-    <color name="ds_surface_dark">#E61E293B</color>
-    <color name="ds_dialog_bg">#FF1E293B</color>
-    <color name="ds_control_idle">#FF334155</color>
-    <color name="ds_control_icon">#FFCBD5E1</color>
-    <color name="ds_bomb_active">#FFEA580C</color>
+    <color name="ds_surface_dark">#FFF1F5F9</color>
+    <color name="ds_dialog_bg">#FFFFFFFF</color>
+    <color name="ds_control_idle">#FFE2E8F0</color>
+    <color name="ds_control_icon">#FF1E293B</color>
+    <color name="ds_bomb_active">#FF2563EB</color>
 
-    <!-- Button polish: strokes and ripples -->
-    <color name="ds_control_stroke">#66475569</color>
+    <color name="ds_control_stroke">#99BFDBFE</color>
     <color name="ds_secondary_stroke">#803B82F6</color>
-    <color name="ds_cta_stroke">#80FB923C</color>
+    <color name="ds_cta_stroke">#8093C5FD</color>
     <color name="ds_primary_stroke">#8060A5FA</color>
-    <color name="ds_ripple_on_dark">#40FFFFFF</color>
-    <color name="ds_ripple_cta">#4DF97316</color>
-    <!-- ui-ux-pro-max: theater / premium dark + spotlight gold (outlines) -->
-    <color name="ds_accent_gold">#FFCA8A04</color>
-    <color name="ds_ripple_gold">#40CA8A04</color>
+    <color name="ds_ripple">#26000000</color>
+    <color name="ds_ripple_cta">#403B82F6</color>
+    <color name="ds_ripple_blue">#4060A5FA</color>
+
+    <color name="ds_glass_fill">#FFFFFFFF</color>
+    <color name="ds_glass_stroke">#FFCBD5E1</color>
+    <color name="ds_bar_stroke">#FFE2E8F0</color>
+    <color name="ds_overlay_scrim">#400F172A</color>
+
+    <color name="ds_key_face">#FFF1F5F9</color>
+    <color name="ds_key_face_accent">#FFDBEAFE</color>
+    <color name="ds_key_face_cta">#FF2563EB</color>
+    <color name="ds_key_stroke">#FF93C5FD</color>
+
+    <!-- GameView (light) -->
+    <color name="ds_game_canvas">#FFF1F5F9</color>
+    <color name="ds_game_board_bg">#FFE2E8F0</color>
+    <color name="ds_game_grid">#6694A3B8</color>
+    <color name="ds_game_board_frame">#CC2563EB</color>
+    <color name="ds_hud_panel">#E6FFFFFF</color>
+    <color name="ds_hud_stroke">#66CBD5E1</color>
+    <color name="ds_hud_label">#FF64748B</color>
+    <color name="ds_hud_value">#FF0F172A</color>
+    <color name="ds_hud_muted">#FF475569</color>
+    <color name="ds_hud_gold">#FFCA8A04</color>
+
+    <!-- Ghost piece outline (readable on light grid) -->
+    <color name="ds_ghost_outline">#D90F172A</color>
 </resources>
